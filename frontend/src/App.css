@@ -36,6 +36,73 @@
   }
 }
 
+/* React Grid Layout样式 */
+.react-grid-layout {
+  position: relative;
+}
+
+.react-grid-item {
+  transition: all 200ms ease;
+  transition-property: left, top;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: white;
+}
+
+.react-grid-item:not(.react-grid-placeholder) {
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.react-grid-item.cssTransforms {
+  transition-property: transform;
+}
+
+.react-grid-item > .react-resizable-handle {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  bottom: 0;
+  right: 0;
+  background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNiIgaGVpZ2h0PSI2IiB2aWV3Qm94PSIwIDAgNiA2IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxnIGZpbGw9IiM0QTVDNkEiIGZpbGwtcnVsZT0iZXZlbm9kZCI+PHBhdGggZD0ibTUgNWgtNHYtNGgtMXY1aDV6Ii8+PC9nPjwvc3ZnPg==');
+  background-position: bottom right;
+  padding: 0 3px 3px 0;
+  background-repeat: no-repeat;
+  background-origin: content-box;
+  box-sizing: border-box;
+  cursor: se-resize;
+}
+
+.react-grid-item > .react-resizable-handle::after {
+  content: "";
+  position: absolute;
+  right: 3px;
+  bottom: 3px;
+  width: 5px;
+  height: 5px;
+  border-right: 2px solid rgba(0,0,0,.4);
+  border-bottom: 2px solid rgba(0,0,0,.4);
+}
+
+.react-grid-placeholder {
+  background: #f0f0f0;
+  opacity: 0.2;
+  transition-duration: 100ms;
+  z-index: 2;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+  border: 2px dashed #3b82f6;
+  border-radius: 8px;
+}
+
+.react-grid-item.react-grid-placeholder {
+  background: #3b82f6;
+  opacity: 0.2;
+}
+
 /* 自定义滚动条样式 */
 ::-webkit-scrollbar {
   width: 8px;
@@ -56,14 +123,63 @@
   background: #a8a8a8;
 }
 
-/* 股票列表样式 */
-.stock-item {
-  transition: all 0.2s ease-in-out;
+/* 股票搜索面板样式 */
+.stock-search-panel {
+  min-height: 100vh;
+  max-height: 100vh;
+  overflow-y: auto;
 }
 
-.stock-item:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+/* 窗口样式 */
+.chart-window {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.window-header {
+  flex-shrink: 0;
+  height: 40px;
+  cursor: move;
+}
+
+.chart-container {
+  flex: 1;
+  position: relative;
+}
+
+.indicator-values {
+  flex-shrink: 0;
+  height: auto;
+  min-height: 32px;
+}
+
+/* 指标工具栏样式 */
+.indicator-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  backdrop-filter: blur(10px);
+}
+
+/* AI分析面板样式 */
+.ai-analysis-panel {
+  margin-top: 16px;
+  max-height: 500px;
+}
+
+/* 拖拽相关样式 */
+.grid-item {
+  cursor: move;
+}
+
+.grid-item:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.grid-item.react-draggable-dragging {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  z-index: 1000;
 }
 
 /* 涨跌颜色 */
@@ -94,37 +210,155 @@
   100% { transform: rotate(360deg); }
 }
 
-/* 图表容器样式 */
-.chart-container {
-  position: relative;
-  width: 100%;
-  height: 400px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* 技术指标卡片样式 */
-.indicator-card {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  padding: 12px;
-  transition: all 0.2s ease-in-out;
-}
-
-.indicator-card:hover {
-  background: #f1f5f9;
-  border-color: #cbd5e1;
-}
-
 /* 响应式设计 */
-@media (max-width: 768px) {
-  .chart-container {
-    height: 300px;
+@media (max-width: 1024px) {
+  .app-container {
+    flex-direction: column;
   }
   
-  .grid-cols-1 {
-    grid-template-columns: 1fr;
+  .stock-search-panel {
+    min-height: auto;
+    max-height: 300px;
+  }
+}
+
+@media (max-width: 768px) {
+  .indicator-toolbar {
+    padding: 8px;
+  }
+  
+  .indicator-toolbar .flex {
+    gap: 4px;
+  }
+  
+  .chart-window .window-header {
+    padding: 8px 12px;
+  }
+  
+  .ai-analysis-panel {
+    margin-top: 8px;
+    max-height: 300px;
+  }
+}
+
+/* 布局网格样式增强 */
+.layout {
+  min-height: 600px;
+}
+
+.react-grid-item.react-grid-item--static {
+  cursor: default;
+}
+
+/* 工具提示样式 */
+.tooltip {
+  position: relative;
+}
+
+.tooltip:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.8);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 1000;
+}
+
+/* 窗口标题栏拖拽手柄 */
+.window-header {
+  background: linear-gradient(to bottom, #f8fafc, #e2e8f0);
+  border-bottom: 1px solid #cbd5e1;
+}
+
+.window-header:hover {
+  background: linear-gradient(to bottom, #e2e8f0, #cbd5e1);
+}
+
+/* 技术指标数值显示 */
+.indicator-values {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  background: linear-gradient(to bottom, #f1f5f9, #e2e8f0);
+}
+
+/* 美化按钮 */
+.btn-primary {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #1d4ed8, #1e40af);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #6b7280, #4b5563);
+  border: none;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background: linear-gradient(135deg, #4b5563, #374151);
+}
+
+/* 专业级图表样式 */
+.professional-chart {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.professional-chart:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* 状态指示器 */
+.status-indicator {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.status-indicator.connected {
+  background: #10b981;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3);
+}
+
+.status-indicator.loading {
+  background: #f59e0b;
+  animation: pulse 2s infinite;
+}
+
+.status-indicator.error {
+  background: #ef4444;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
   }
 }
