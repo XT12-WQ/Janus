@@ -196,37 +196,49 @@ async def search_stocks(query: str = ""):
 
 @api_router.get("/stocks/{stock_code}/kline")
 async def get_kline_data(stock_code: str, period: str = "daily", limit: int = 100):
-    """获取K线数据"""
+    """获取K线数据 - 测试版本"""
     try:
-        # 根据周期选择不同的数据获取方法
-        if period == "daily":
-            df = ak.stock_zh_a_hist(symbol=stock_code, period="daily", adjust="qfq")
-        elif period == "weekly":
-            df = ak.stock_zh_a_hist(symbol=stock_code, period="weekly", adjust="qfq")
-        elif period == "monthly":
-            df = ak.stock_zh_a_hist(symbol=stock_code, period="monthly", adjust="qfq")
-        else:
-            df = ak.stock_zh_a_hist(symbol=stock_code, period="daily", adjust="qfq")
+        # 生成模拟K线数据
+        from datetime import datetime, timedelta
+        import random
         
-        if df.empty:
-            return {"kline_data": [], "message": "暂无数据"}
-        
-        df = df.tail(limit).reset_index()
+        base_price = 100.0
+        if stock_code == "000001":
+            base_price = 12.35
+        elif stock_code == "600036":
+            base_price = 45.67
+        elif stock_code == "600519":
+            base_price = 1856.00
+        elif stock_code == "000858":
+            base_price = 155.43
         
         kline_data = []
-        for _, row in df.iterrows():
-            try:
-                kline = KlineData(
-                    timestamp=str(row['日期']),
-                    open=float(row['开盘']),
-                    high=float(row['最高']),
-                    low=float(row['最低']),
-                    close=float(row['收盘']),
-                    volume=int(row['成交量'])
-                )
-                kline_data.append(kline)
-            except (ValueError, KeyError) as e:
-                continue
+        current_date = datetime.now() - timedelta(days=limit)
+        current_price = base_price
+        
+        for i in range(limit):
+            # 模拟价格波动
+            change_percent = random.uniform(-0.05, 0.05)  # ±5%波动
+            new_price = current_price * (1 + change_percent)
+            
+            high = new_price * random.uniform(1.0, 1.02)
+            low = new_price * random.uniform(0.98, 1.0)
+            open_price = current_price
+            close_price = new_price
+            volume = random.randint(1000000, 50000000)
+            
+            kline = KlineData(
+                timestamp=current_date.strftime("%Y-%m-%d"),
+                open=round(open_price, 2),
+                high=round(high, 2),
+                low=round(low, 2),
+                close=round(close_price, 2),
+                volume=volume
+            )
+            kline_data.append(kline)
+            
+            current_date += timedelta(days=1)
+            current_price = new_price
         
         return {"kline_data": kline_data}
     except Exception as e:
