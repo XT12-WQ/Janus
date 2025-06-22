@@ -71,7 +71,7 @@ def calculate_ma(data: pd.DataFrame, period: int = 20) -> List[float]:
     if len(data) < period:
         return [None] * len(data)
     ma_values = data['close'].rolling(window=period).mean()
-    return ma_values.fillna(None).tolist()
+    return ma_values.tolist()
 
 def calculate_rsi(data: pd.DataFrame, period: int = 14) -> List[float]:
     """计算RSI指标"""
@@ -81,9 +81,11 @@ def calculate_rsi(data: pd.DataFrame, period: int = 14) -> List[float]:
     delta = data['close'].diff()
     gain = (delta.where(delta > 0, 0)).rolling(window=period).mean()
     loss = (-delta.where(delta < 0, 0)).rolling(window=period).mean()
-    rs = gain / loss
+    
+    # 避免除零错误
+    rs = gain / (loss + 1e-10)
     rsi = 100 - (100 / (1 + rs))
-    return rsi.fillna(None).tolist()
+    return rsi.tolist()
 
 def calculate_macd(data: pd.DataFrame, fast: int = 12, slow: int = 26, signal: int = 9) -> Dict:
     """计算MACD指标"""
@@ -101,9 +103,9 @@ def calculate_macd(data: pd.DataFrame, fast: int = 12, slow: int = 26, signal: i
     histogram = macd - signal_line
     
     return {
-        'macd': macd.fillna(None).tolist(),
-        'signal': signal_line.fillna(None).tolist(),
-        'histogram': histogram.fillna(None).tolist()
+        'macd': macd.tolist(),
+        'signal': signal_line.tolist(),
+        'histogram': histogram.tolist()
     }
 
 
