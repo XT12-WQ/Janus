@@ -218,6 +218,16 @@ const ChartWindow = ({ window, stockCode, stockName, onRemove }) => {
         borderColor: '#cccccc',
         timeVisible: true,
         secondsVisible: false,
+        fixLeftEdge: true,
+        fixRightEdge: true,
+      },
+      localization: {
+        locale: 'en-US',
+        priceFormatter: (price) => price.toFixed(2),
+        timeFormatter: (time) => {
+          const date = new Date(time * 1000);
+          return date.toLocaleDateString('en-US');
+        },
       },
     });
 
