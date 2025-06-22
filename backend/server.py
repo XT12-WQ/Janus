@@ -71,7 +71,14 @@ def calculate_ma(data: pd.DataFrame, period: int = 20) -> List[float]:
     if len(data) < period:
         return [None] * len(data)
     ma_values = data['close'].rolling(window=period).mean()
-    return ma_values.tolist()
+    # 处理NaN值
+    result = []
+    for val in ma_values:
+        if pd.isna(val) or not np.isfinite(val):
+            result.append(None)
+        else:
+            result.append(float(val))
+    return result
 
 def calculate_rsi(data: pd.DataFrame, period: int = 14) -> List[float]:
     """计算RSI指标"""
@@ -83,9 +90,18 @@ def calculate_rsi(data: pd.DataFrame, period: int = 14) -> List[float]:
     loss = (-delta.where(delta < 0, 0)).rolling(window=period).mean()
     
     # 避免除零错误
-    rs = gain / (loss + 1e-10)
+    loss = loss.replace(0, 1e-10)
+    rs = gain / loss
     rsi = 100 - (100 / (1 + rs))
-    return rsi.tolist()
+    
+    # 处理NaN值和无穷大值
+    result = []
+    for val in rsi:
+        if pd.isna(val) or not np.isfinite(val):
+            result.append(None)
+        else:
+            result.append(float(val))
+    return result
 
 def calculate_macd(data: pd.DataFrame, fast: int = 12, slow: int = 26, signal: int = 9) -> Dict:
     """计算MACD指标"""
@@ -102,10 +118,20 @@ def calculate_macd(data: pd.DataFrame, fast: int = 12, slow: int = 26, signal: i
     signal_line = macd.ewm(span=signal).mean()
     histogram = macd - signal_line
     
+    # 处理NaN值和无穷大值
+    def clean_values(series):
+        result = []
+        for val in series:
+            if pd.isna(val) or not np.isfinite(val):
+                result.append(None)
+            else:
+                result.append(float(val))
+        return result
+    
     return {
-        'macd': macd.tolist(),
-        'signal': signal_line.tolist(),
-        'histogram': histogram.tolist()
+        'macd': clean_values(macd),
+        'signal': clean_values(signal_line),
+        'histogram': clean_values(histogram)
     }
 
 
