@@ -247,19 +247,32 @@ async def get_kline_data(stock_code: str, period: str = "daily", limit: int = 10
 
 @api_router.get("/stocks/{stock_code}/indicators")
 async def get_technical_indicators(stock_code: str, indicators: str = "ma,rsi,macd"):
-    """获取技术指标数据"""
+    """获取技术指标数据 - 测试版本"""
     try:
-        # 获取历史数据
-        df = ak.stock_zh_a_hist(symbol=stock_code, period="daily", adjust="qfq")
-        if df.empty:
+        # 首先获取K线数据
+        kline_response = await get_kline_data(stock_code, "daily", 100)
+        kline_data = kline_response["kline_data"]
+        
+        if not kline_data:
             return {"indicators": {}, "message": "暂无数据"}
         
-        df = df.tail(100).reset_index()
-        df.columns = ['date', 'open', 'high', 'low', 'close', 'volume', 'turnover', 'amplitude', 'change_percent', 'change_amount', 'turnover_rate']
+        # 转换为DataFrame进行计算
+        data = []
+        for kline in kline_data:
+            data.append({
+                'date': kline.timestamp,
+                'open': kline.open,
+                'high': kline.high,
+                'low': kline.low,
+                'close': kline.close,
+                'volume': kline.volume
+            })
+        
+        df = pd.DataFrame(data)
         
         indicators_list = indicators.split(',')
         result_indicators = {}
-        timestamps = df['date'].astype(str).tolist()
+        timestamps = df['date'].tolist()
         
         for indicator in indicators_list:
             indicator = indicator.strip().lower()
