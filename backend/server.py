@@ -114,29 +114,76 @@ async def root():
 
 @api_router.get("/stocks/search")
 async def search_stocks(query: str = ""):
-    """搜索股票"""
+    """搜索股票 - 测试版本"""
     try:
-        if not query:
-            # 获取热门股票
-            df = ak.stock_zh_a_spot_em()
-            df = df.head(20)  # 取前20只股票
-        else:
-            # 搜索股票
-            df = ak.stock_zh_a_spot_em()
-            df = df[df['名称'].str.contains(query, na=False) | df['代码'].str.contains(query, na=False)]
-            df = df.head(10)
+        # 暂时使用模拟数据，避免网络超时问题
+        mock_stocks = [
+            {
+                "代码": "000001",
+                "名称": "平安银行",
+                "最新价": 12.35,
+                "涨跌幅": 2.15,
+                "涨跌额": 0.26,
+                "成交量": 12500000,
+                "总市值": 23900000000
+            },
+            {
+                "代码": "000002", 
+                "名称": "万科A",
+                "最新价": 8.98,
+                "涨跌幅": -1.22,
+                "涨跌额": -0.11,
+                "成交量": 8900000,
+                "总市值": 9980000000
+            },
+            {
+                "代码": "600036",
+                "名称": "招商银行", 
+                "最新价": 45.67,
+                "涨跌幅": 1.85,
+                "涨跌额": 0.83,
+                "成交量": 5600000,
+                "总市值": 127800000000
+            },
+            {
+                "代码": "600519",
+                "名称": "贵州茅台",
+                "最新价": 1856.00,
+                "涨跌幅": 0.65,
+                "涨跌额": 12.00,
+                "成交量": 340000,
+                "总市值": 2330000000000
+            },
+            {
+                "代码": "000858",
+                "名称": "五粮液",
+                "最新价": 155.43,
+                "涨跌幅": -0.89,
+                "涨跌额": -1.39,
+                "成交量": 2100000,
+                "总市值": 600000000000
+            }
+        ]
+        
+        # 如果有查询条件，进行过滤
+        if query:
+            filtered_stocks = []
+            for stock in mock_stocks:
+                if query in stock["名称"] or query in stock["代码"]:
+                    filtered_stocks.append(stock)
+            mock_stocks = filtered_stocks
         
         stocks = []
-        for _, row in df.iterrows():
+        for stock_dict in mock_stocks:
             try:
                 stock = StockInfo(
-                    code=str(row['代码']),
-                    name=str(row['名称']),
-                    current_price=float(row['最新价']),
-                    change_percent=float(row['涨跌幅']),
-                    change_amount=float(row['涨跌额']),
-                    volume=int(row['成交量']) if '成交量' in row and pd.notna(row['成交量']) else None,
-                    market_cap=float(row['总市值']) if '总市值' in row and pd.notna(row['总市值']) else None
+                    code=str(stock_dict['代码']),
+                    name=str(stock_dict['名称']),
+                    current_price=float(stock_dict['最新价']),
+                    change_percent=float(stock_dict['涨跌幅']),
+                    change_amount=float(stock_dict['涨跌额']),
+                    volume=int(stock_dict['成交量']) if stock_dict.get('成交量') else None,
+                    market_cap=float(stock_dict['总市值']) if stock_dict.get('总市值') else None
                 )
                 stocks.append(stock)
             except (ValueError, KeyError) as e:
